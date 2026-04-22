@@ -8,7 +8,7 @@ export async function generateWithAI(prompt: string) {
       "X-Title": "Creative Scale AI",
     },
     body: JSON.stringify({
-      model: "openrouter/free",
+      model: "meta-llama/llama-3.1-8b-instruct",
       messages: [
         { role: "system", content: "You are a TikTok Shop creative generator expert. Always respond with valid JSON only, no extra text." },
         { role: "user", content: prompt }
