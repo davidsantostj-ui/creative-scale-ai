@@ -1,0 +1,38 @@
+export async function generateWithAI(prompt: string) {
+  const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
+      "Content-Type": "application/json",
+      "HTTP-Referer": "https://creative-scale-ai.vercel.app",
+      "X-Title": "Creative Scale AI",
+    },
+    body: JSON.stringify({
+      model: "openrouter/free",
+      messages: [
+        { role: "system", content: "You are a TikTok Shop creative generator expert. Always respond with valid JSON only, no extra text." },
+        { role: "user", content: prompt }
+      ],
+      max_tokens: 4000
+    })
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error?.message || "Failed to generate");
+  }
+
+  const data = await response.json();
+  const content = data.choices?.[0]?.message?.content;
+  
+  if (!content) throw new Error("Empty response from AI");
+
+  const jsonMatch = content.match(/```json\n?([\s\S]*?)\n?```/) || content.match(/\{[\s\S]*\}/);
+  const jsonStr = jsonMatch ? (jsonMatch[1] || jsonMatch[0]) : content;
+
+  try {
+    return JSON.parse(jsonStr);
+  } catch {
+    throw new Error("Invalid JSON response");
+  }
+}
