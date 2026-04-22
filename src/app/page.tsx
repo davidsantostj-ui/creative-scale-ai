@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import { Copy, ExternalLink, Sparkles, Loader2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Copy, ExternalLink, Sparkles, Loader2, History, LogOut } from "lucide-react";
 import { toast } from "sonner";
+import { Analytics } from "@vercel/analytics/react";
 
 interface CreativeData {
   produto: {

@@ -1,5 +1,6 @@
 import "./globals.css";
 import { Toaster } from "sonner";
+import { Analytics } from "@vercel/analytics/react";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -14,7 +15,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-BR">
-      <body>{children}<Toaster richColors position="bottom-right" /></body>
+      <body>
+        {children}
+        <Toaster richColors position="bottom-right" />
+        <Analytics />
+      </body>
     </html>
   );
 }
