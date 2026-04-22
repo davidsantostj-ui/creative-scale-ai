@@ -1,8 +1,16 @@
 export async function generateWithAI(prompt: string) {
+  const apiKey = process.env.OPENROUTER_API_KEY;
+  
+  console.log("API Key configured:", !!apiKey);
+  
+  if (!apiKey) {
+    throw new Error("OPENROUTER_API_KEY not configured");
+  }
+
   const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
     method: "POST",
     headers: {
-      "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
+      "Authorization": `Bearer ${apiKey}`,
       "Content-Type": "application/json",
       "HTTP-Referer": "https://creative-scale-ai.vercel.app",
       "X-Title": "Creative Scale AI",
@@ -19,6 +27,7 @@ export async function generateWithAI(prompt: string) {
 
   if (!response.ok) {
     const error = await response.json();
+    console.error("API Error:", error);
     throw new Error(error.error?.message || "Failed to generate");
   }
 
