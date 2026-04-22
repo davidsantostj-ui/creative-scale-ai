@@ -1,7 +1,5 @@
 export async function generateWithAI(prompt: string) {
-  const apiKey = process.env.OPENROUTER_API_KEY;
-  
-  console.log("API Key configured:", !!apiKey);
+  const apiKey = process.env.OPENROUTER_API_KEY || "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";
   
   if (!apiKey) {
     throw new Error("OPENROUTER_API_KEY not configured");
@@ -12,8 +10,6 @@ export async function generateWithAI(prompt: string) {
     headers: {
       "Authorization": `Bearer ${apiKey}`,
       "Content-Type": "application/json",
-      "HTTP-Referer": "https://creative-scale-ai.vercel.app",
-      "X-Title": "Creative Scale AI",
     },
     body: JSON.stringify({
       model: "meta-llama/llama-3.1-8b-instruct",
@@ -27,7 +23,6 @@ export async function generateWithAI(prompt: string) {
 
   if (!response.ok) {
     const error = await response.json();
-    console.error("API Error:", error);
     throw new Error(error.error?.message || "Failed to generate");
   }
 
