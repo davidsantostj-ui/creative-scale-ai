@@ -29,11 +29,13 @@ class PlaywrightScraper {
     try {
       page = await this.browser.newPage();
       
-      // Set viewport and user agent
+      // Set viewport
       await page.setViewportSize({ width: 1920, height: 1080 });
-      await page.setUserAgent(
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
-      );
+
+      // Set extra headers to mimic real browser
+      await page.setExtraHTTPHeaders({
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+      });
 
       // Navigate to URL
       await page.goto(url, { waitUntil: "networkidle", timeout: options.timeout || 30000 });

@@ -1,5 +1,19 @@
-import NextAuth, { type NextAuthOptions } from "next-auth";
+import NextAuth, { type NextAuthOptions, type DefaultSession } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+
+declare module "next-auth" {
+  interface Session extends DefaultSession {
+    user: DefaultSession["user"] & {
+      id: string;
+    };
+  }
+
+  interface User {
+    id: string;
+    email: string;
+    name?: string;
+  }
+}
 
 // In-memory user store for demo - replace with database in production
 const DEMO_USERS = [
