@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { generateCreative } from "@/lib/generator";
 import { cache, getCacheKey } from "@/lib/cache";
 import { rateLimit } from "@/lib/rate-limit";
+import { analytics } from "@/lib/analytics";
 
 export async function POST(request: NextRequest) {
   try {
@@ -10,6 +11,7 @@ export async function POST(request: NextRequest) {
     const rateLimitResult = rateLimit(ip);
     
     if (!rateLimitResult.success) {
+      analytics.track("rate_limit", { ip });
       return NextResponse.json(
         { error: `Rate limit exceeded. Try again in ${rateLimitResult.retryAfter}s` },
         { status: 429, headers: { "Retry-After": rateLimitResult.retryAfter.toString() } }
@@ -27,6 +29,7 @@ export async function POST(request: NextRequest) {
     
     if (cachedCreative) {
       console.log(`Cache hit for ${link}`);
+      analytics.track("cache_hit", { link });
       return NextResponse.json({ ...cachedCreative, fromCache: true });
     }
 
@@ -35,11 +38,15 @@ export async function POST(request: NextRequest) {
     // Store in cache (24 hours)
     cache.set(cacheKey, creative, 24 * 60 * 60 * 1000);
     
+    analytics.track("generate", { link, plataforma: creative.produto?.nome });
+    
     return NextResponse.json(creative);
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : "Erro ao gerar criativos";
     console.error("Generation error:", error);
+    analytics.track("error", { error: errorMessage });
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Erro ao gerar criativos" },
+      { error: errorMessage },
       { status: 500 }
     );
   }
